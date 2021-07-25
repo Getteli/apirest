@@ -1,0 +1,813 @@
+video 01:
+	configurar o VM e instalando o Homestead
+	Homestead é uma ambiente de desenvolvimento de teste, nele ja possui php, banco e etc, sem precisar instalar na maquina mesmo
+	ele roda dentro de uma VM, por isso é preciso ter uma VM instalada
+	o Homestead do laravel é oficial da Vagrant. A ideia é que o Homestead seja um script para automatizar e testar.
+
+	Nesse primeiro passo estamos configurando, vamos fazer uma API para uma escola, de teste.
+
+	Para instalar o homestead e a VM pesquise na internet, nao vou por links pois sempre atualiza e muda.
+	Após instalar, va na pasta Homestead e encontre o arquivo Homestead.yaml
+	nele vai ter a configuracao do map na parte de SITES:, onde vc escolhe o link e o caminho (q fica dentro da vm, homestead) onde ficara a pasta a ser aberta pelo link escolhido.
+	depois na parte de DATABASES: vc coloca o nome do banco que vai ser criado
+	na parte de FOLDERS: o map é a pasta local, e ela aponta para a msm pasta onde esta no homestead, na parte de TO
+		- map: /var/www/html/apirest
+		  to: /home/vagrant/code
+	porem o problema é q no linux a pasta var, ela esta dando problema, no default o homestead aponta a pasta code para a pasta de usuario no home. Entao a pasta para estudar esta no usuario, mas salvo o codigo dentro do var/html para salvar o codigo no git
+	Para iniciar, de um vagrant up, ja dentro da pasta homestead, e entao vagrant reload --provision para atualizar qualquer mudança no codigo .yaml ou etc.
+
+	conecte o ip q esta no homestead ao host local, abra pelo terminal o sudo nano /etc/hosts, e add o ip q esta no homestead e o nome da url
+	depois só salvar
+	essa url é a msm no .yaml
+
+	inicie primeiramente a vm pelo virtual box, inicia a maquina
+	entao via terminal use o vagrant up  - deixar de pé o projeto
+	vagrant reload --provision  - para atualizar qualquer mudança
+	Para acessar o homestead la na VM, use o comando vagrant ssh  - para abrir o homestead e ter acesso aos projetos dentro
+
+	entao crie a pasta q vc configurou no .yaml, crie o projeto seja em laravel ou etc
+	ao criar o projeto e as coisas dentro da pasta code no homestead, ele q mapeou a pasta no local, fará o mesmo automaticamente.
+
+video 02:
+	Salvando o codigo no git
+	é apenas uma explicacao de como fazer e usar, no curso ele salvou o codigo base ja no git, do projeto da escola do laravel
+
+video 03:
+	Criando o banco de dados
+
+	nesse projeto de escola criamos 2 tabelas, estudante e sala, e entao criamos as migrate e rodamos
+	como um projeto de laravel normal q ja fizemos
+
+	depois criamos uma instancia no mysql workbench pois é onde vamos acessar o banco q esta na VM/homestead, use o IP, usuario homestead e a senha secret, q esta no .yaml e cria a conexao, ao rodar os migrates no vagrant, la na vm, o banco é criado e podemos acessar no workbench
+
+video 04:
+	criando models
+	crie os models usando o php artisan
+	das tabelas que falamos
+
+	depois crie funcoes de nevagacao entre as relacoes das tabelas
+
+video 05:
+	vamos testar os models criados na aula anterior
+	o laravel tem o tinker
+	php artisan tinker
+	ele abre um tipo de vimo/cmd onde podemos testar as classes e codigos, em php msm
+	entao damos o comando do tinker
+	e de pois por ex, criando via create da tabela, padrao
+
+	App\Models\Classroom::create(['description'=> 'primeiro ano'])
+
+	depois ele mostra o resultado, o item criado, e ele foi criado no banco msm, real
+	e entao podemos colocar esse registro em uma variavel
+	
+	$sala = App\Models\Classroom::find(1)
+
+	e entao damos enter, para fazer outro comando
+	É UM POR LINHA
+	depois por ex, criamos usando a navegacao por relacionamento, pela variavel da sala, vamos acessar o studante e criar, usando o default create
+
+	$sala->students()->create(['name' => 'joao', 'birth' => '2001-01-22', 'gerder' => 'm'])
+
+video 06:
+	entendendo as rotas e o que vamos usar
+	no laravel tem 2 arquivos de rotas (routes1), API e WEB
+	o WEB é o caminho padrao, por onde um sistema vai usar as rotas pra fazer suas funcoes e cruds
+	a diferença dele para o WEB esta nos seus filtros e middleware, onde no web existem protecoes e etc que sao diferentes da API
+	no web tem por ex o csrf token
+	e na api nao.
+
+	No da API nos sempre usaremos o prefixo api
+	ou seja, meusite.com.br/api/rotadesejada....
+	dentro da rota podemos criar as rotas por metodos (get, post...)
+	cada um deles tem seu uso especifico
+	e cada um deles (web ou API) servem para seus propositos
+	no kernel da para ver os middleware e as diferenas entre a API e o WEB, as chamadas e maps e etc..
+	o da API é usada para api mesmo, nao para endereços de url no navegador, é usada para webservices e api rest e etc..
+
+video 07:
+	Verbos HTTP, são get, post, put, delete, ...
+
+	Como ja estudamos isso no curso de webservices em php, ja sabemos, mas relembrando
+	get -> pega os dados
+	post -> envia
+	put -> envia mas com algum dado referente
+	delete -> excluir
+
+	na API colocamos o routes com algum desses vermos, corretamente
+
+	outra coisa é, nao precisamos usar uma funcao dentro do routes direto
+
+	podemos chamar um controller e entao por um @ e o nome do metodo q iremos chamar q esta no controller, (tudo entre aspas)
+
+video 08:
+	Criando os controllers
+
+	No laravel sabemos q tem o make controller, no artisan
+	porem, para API, PODEMOS usar no final do comando make um --api
+	ele criará ja os metodos padroes
+	os nomes q usamos nos metodos na api.php sao nomes padroes q o laravel usa
+	
+	index -> traz tudo
+	show -> traz um especifico
+	store -> guarda, cria um registro
+	update -> atualiza
+	destroy -> delete
+
+	entao ele cria os metodos ja padrao usados no api.
+
+	os retornos sao diretos do controller
+	e se for a forma padrao das classes, como um :get(), ou find() e por ai vai, ele retorna tudo em JSON
+	mas podemos tratar e etc.
+
+video 09:
+	baixar o postman
+	para fazer testes de requisicoes de post, get e outros verbos http
+
+	use o resttesttest (https://resttesttest.com/)
+
+video 10:
+	respostas (response) personalizada
+	como falamos, o laravel ja retorna uma resposta em json nativamente quando se usa metodos nativos de pegar os dados e etc
+
+	para isso precisamos usar uma classe do http, o Response, e entao instanciar como parametro do tipo Response
+	essa classe pode ser usada para uma resposta personalizada. exemplo:
+
+		// podemos retornar de forma padrao, q ja retorna em json
+		return Student::get();
+
+		// podemos ter uma resposta personalizada, usando o setContent e dentro dela colocar a classe, mudar o tipo de retorno, colocar o codigo, o header e etc
+		return $response->setContent(Student::get()->toJson())
+		->setStatusCode(200)
+		->header('Content-Type', 'application/json');
+
+		// caso nao queira usar a forma acima, podemos fazer usando um helper do laravel, sem precisar chamar a classe do http **
+		return response(Student::get(), 200)
+		->header('Content-Type', 'application/json');
+
+		// ou caso nao queira modificar o header manualmente, no proprio helper tem um metodo para o retorno, pesquisar
+		return response()->json(Student::get(), Response::HTTP_OK);
+
+	as classes usadas para o response, pode ser encontradas aqui:
+		// chamar o response do Http **
+		use Illuminate\Http\Response;
+		// caso nao queira usar os numeros dos codigos de respostas, pode usar uma classe padrao q tem constantes com cada um dos codigos
+		use Symfony\Component\HttpFoundation\Response;
+
+	e o parametro:
+		(Response $response) // se colocarmos o response da classe q la em cima do Http **
+
+video 11:
+	implementando um endpoint
+	vamos criar um endpoint de pegar (get) um usuario especifico, passando o id
+	como nos criamos o endpoint seguindo a regra padrao do laravel, no api.php no routes
+	o de exibir um registro por id ficou:
+	Route::get('/students/{student}', 'StudentController@show');
+
+	e no controller criado como api, ele ja implementou o metodo show
+	nele esta passando o id e entao usamos como o laravel padrao
+	usando a classe desejada e o metodo find passando o id
+	para melhorar isso, podemos em vez de retornar direto
+	ir para uma variavel e verificar se ela possui algum dado
+	se nao possui podemos retornar uma mensagem, passar o código http
+	cmoo video no video 10 usando o helper response e etc
+
+video 12:
+	trabalhando com request
+
+	como ja sabemos, enviamos dados por tipo post
+	API normalmente usa raw (texto)
+	se fizer o texto ou dado como json, ele ja muda o application para json
+	{
+		"input": "dado"
+	}
+	e por ai vai..
+	no lado da api
+	pegamos por $request, parametro q esta no metodo store do controller da classe,
+	e podemos pegar o dado como
+	$request->input("input")
+	ou se quiser mostrar tudo usa o 
+	all()
+	o laravel consegue pegar o dado msm sendo texto, mas com a formatacao de json, entao envie o dado como json
+
+video 13:
+	continuando o que vimos no video 12, fazendo um endpoint para inserir dados
+	colocamos o envio via json como todo o resto, e no controller podemos pegar os dados passados no parametro ja definido do tipo Request chamado $request
+	para ver os dados em json use o metodo all do Request, assim: $request->all()
+	e se a insercao do dado for algo simples sem alguma verificacao antes nem nada do tipo ou uma query sem join nem nada do tipo
+	use o metodo create do controller da tabela student q fazemos, entao fica
+	Student::create(); e passe dentro do () o request->all()
+
+	se der erro ele retorna o cod 500, porem com msg nao tratada nem em json para isso
+	faça um try catch e use o \Throwable por ser o mais alto
+	e entao no catch, use o response para mandar o codigo (usando o enumeration q fica mais legivel) e mande uma msg, com erro, pegando do proprio throwable $e->getMessage, ou escreva alguma msg e mande o erro para vc em log ou email para saber..
+
+	enfim, o mesmo endpoint mudando o tipo de requisicao, ja muda o metodo pelo proprio laravel, apenas configurando certinho no api.php no routes
+
+video 14:
+	endpoint de update
+
+	ele é do metodo put por definicao, passa o id pelo endpoint, como obrigatorio (opcional vc coloca um ?, pesquisar)
+	e no metodo no controller update tem o request e o id
+	é uma mistura de post (store) com o get (show)
+	entao utilize os msm metodos do store, mas mude para update e nao create, e pelo controller use o metodo find com o id para pegar o usuario desejado para update, e passe o request->all
+	obs: lembre-se de enviar os dados como JSON, content-type application/json e sendo raw/texto mas como json
+
+	de resto é parecido com os 2, vc pode modificar e editar as msgs e o tratamento, usando try e etc.
+
+video 15:
+	endpoint de deletar destroy/destruir
+
+	segue o mesmo caminho de um update
+	a gente busca o registro na tabela, se nao achar returna um erro
+	se achar, entra no try, se der erro retorna msg com erro 500
+	e no bloco do try
+	coloca para excluir usando o metodo padrao OU se na regra de negocio for diferente, use outro
+	o metodo padrao simplesmente deleta, 
+	exemplo:
+	$student->delete()
+	nao precisa passar o id, pois como a gente pesquisou qual o registro usando o find antes, podemos chamar o metodo delete da propria variavel q criamos e esta recebendo o registro encontrado.
+
+	feito os metodos de CRUD, vemos que é repetitivo, mesma estrutura de try, mesma estrutura de find e etc.. vamos ver como melhorar
+
+video 16:
+	melhorando as respostas de erro
+	veja na documentacao da mozilla sobre os tipos de retornos dos protocolos http
+	de 100 a 599
+	200 - respostas
+	400 - erro no lado do cliente
+	500 - erros internos
+
+	e por ai vai, é bom deixar padronizado
+	mais a frente usaremos o padrao JSON API, pesquisar sobre como ele retorna os erros, a padronizacao, botando codigo, tipos de erro internos q podemos ter, linkar isso a algum tipo de erro de http e etc
+	e sempre documentar isso em algum lugar para saber o por que, e o que aquele erro diz. fazer tipo uma documentacao mesmo
+
+video 17:
+	retornando diretamente os erros
+
+	no controller, em vez de retornar padrao, faremos um codigo mais manual passando em json alguns parametros como
+	codigo interno onde podemos documentar e deixar facil a manutencao/correcao ou explicacao
+	codigo do http, mensagem, detalhes e etc.
+	seguindo uma padronizacao web do json tambem, e podendo fazer documentacao da api nossa. interna
+
+video 18:
+	tratando erro 404 de forma melhor e enxugar o codigo
+	e route model binding
+
+	Nosso controller esta repetindo muito o codigo, tanto no retorno de erro quanto em um metodo, o find, para pesquisar o registro
+	isso é ruim pois em uma manutencao futura teria q fazer uma correcao em cada um, em vez de apenas 1
+
+	para resolver isso, usaremos o laravel como tratamento de exception natural, e dentro dele faremos as modificacoes que desejarmos.
+
+	o Laravel trata seus erros de forma nativa em App\Exceptions\Handler.php
+	nele antigamente, nas versoes 8 <, tinha o metodo render
+	agora no 8 temos o register, e dentro dele um metodo padrao chamado reportable
+	com base nesse, criaremos um q se chama renderable q se tornará parecido com o render antigo
+	esse metodo vai receber a exception e o request com os dados no parametro de sua function. e entao iremos mandar os dados para um outro metodo, em uma trait, um tipo de classe q criaremos, e faremos uma pasta dentro do exceptions, chamada Traits, o novo trait se chamara ApiException
+	{veja na pasta codes}
+	lá iremos tratar um ou mais tipos de erros
+	no momento apenas tratamos o de nao encontrado.
+	Para usar a trait, chamamos ela no handler, e dentro da classe use a ApiException para instancia
+	e o código fica assim
+
+	// as exceçoes padrao do laravel cai aqui, esse metodo nao existia, eu q fiz, no laravel antigo tinha o metodo render, agora no 8 nao tem, tem o renderable. e botei o request
+	// o erro cai aqui de forma nativa,
+	$this->renderable(function (Throwable $e, $request) {
+		// poderia chamar aqui direto o erro, porem vamos criar um traid (tipo uma classe) onde poderemos criar os metodos todos q farao o tratamento de erro por cada tipo de erro q o eloquent tenha
+		// neste caso fizemos apenas o de nao encontrado
+		return $this->getJsonException($request, $e);
+	});
+
+	entao a trait será assim
+
+	// temos que instanciar a classe q o exception retorna, para verificarmos no instanceof
+	use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+	// para pegar o enumeration dos tipos de exceptions de http
+	use Illuminate\Http\Response;
+
+	trait ApiException
+	{
+		// metodo que vai pegar o exception em json, recebe o request se tiver e o erro
+		public function getJsonException($request, $e)
+		{
+			// quando o registro nao foi encontrado, o laravel retorna um erro instanciado numa classe chamada NotFoundHttpException
+			// entao verificamos se o exception é uma instancia dessa classe, e retornamos o erro manual que criamos, fazendo todos os erros centralizados aqui (desse tipo)
+			if ($e instanceof NotFoundHttpException) {
+				// exemplo de retorno de erro diretamente, de forma manual, video 17
+				return response()->json([
+					"errors" => [
+						[
+							"status" => 404, // o codigo de retorno padrao do http da internet
+							"code" => "01", // codigo interno da nossa api onde documentaremos os tipos de erros e dando codigos
+							"message" => "Registro não encontrado" // mensagem explicando o erro, deixando legivel para humanos
+						]
+					]
+				], Response::HTTP_NOT_FOUND);
+			}
+		}	
+	}
+
+	Então no controler, nós mudaremos, retiraremos todo o código que esteja querendo tratar o erro E o código que tenta buscar com o find, iremos usar o outro metodo findOrFail (nativo do laravel), se dar erro ele envia direto para o exception interno do laravel, onde já modificamos
+
+	e apenas retorne o registro do metodo, assim
+	return Student::findOrFail($id);
+
+	o Route Model Binding (ou Bind)
+	ele é uma forma simplificada de achar o registro pelo seu id
+	em vez de passar o id, e depois instanciar a classe e pesquisar com o find ou outro metodo
+	ele ja pega o item diretamente do parametro, como ele faz isso ?
+	na rota nos passamos o parametro de id, com o nome de student (nesse exemplo)
+	entao no metodo do controller q foi chamado, mudamos o parametro q passamos (q tem o nome de id, mas pode ter outro nome)
+	para o MESMO NOME q foi passado na rota, no caso studento, e colocamos o seu TIPO com a classe que queremos, entao ficou
+	
+	public function show(Student $student)
+
+	com isso nos ja temos a classe instanciada E o registro especifico nela
+	nao precisamos mais fazer um find, nem verificar se foi achado nem nada do tipo, direto dessa variavel podemos usar os metodos da classe student, ja q ela é o model
+	e entao fica assim
+	return $student;
+	pronto
+
+video 19:
+	melhorando o tratamento de erro 404
+
+	para melhorar o que fizemos anteriormente, no trait, iremos remover o codigo q faz o retorno de json
+	iremos criar um metodo chamado notFoundException e chama-lo, e dentro desse, chamar outro metodo q vamos criar chamado getResponse, e passar por parametro o que queremos exibir, no nosso exemplo foi o codigo interno criado, o status http e a mensagem, e no get response usamos o codigo de retorno em json com os parametros novos
+
+	melhorando a manutencao e separando os tipos de erros, mas no getResponse centralizando todos
+
+video 20:
+	tratamento de erro interno
+
+	fizemos todo o processo de melhoria de erro 404
+	porem no controller ainda tem trycatch e se der erro envia erro 500
+	vamos juntar tudo isso no apiException, se nao for o notFoundHttpException de 404, retorna um erro generico
+	um genericException, metodo criado pela gente, nele vai chamar o getResponse e vai retornar aquele json criado pela gente, agora com erro 500
+
+video 21:
+	continuando o tratamento de erro HTTP
+
+	caso nao caia no notFoundHttpException, nos faremos um outro if, antes do erro generico
+	veremos agora q o exception pode ser do tipo HttpException, onde ele pode ter N tipo de erros
+	vamos utilizar pela instancia
+	use Symfony\Component\HttpKernel\Exception\HttpException;
+	na pasta Exception tem VARIAS classes de cada um dos tipos, todas herdando da classe HttpException de erro q o laravel trata
+
+	agora dentro do if, iremos fazer uma mudança, criar o metodo httpException, diferente do HttpException, H minusculo e dentro da trait
+	e passaremos a exception como parametro o $e
+
+	o Exception, se for da instancia das classes extendidas ao HttpException, tera metodos para pegar o codigo do status da requisicao
+	entao dentro desse metodo httpException, teremos como nos outros metodos, chamando o getResponse e passando msg, code, status... porem a diferença é
+	como nao sabemos qual o erro q esta acontecendo nesse momento
+	pegaremos o codigo pelo metodo da exception, assim
+	$e->getStatusCode, pode mudar pela versao do laravel
+	ai agora temos o codigo
+	e com isso podemos criar algum metodo externo com array e passando cada tipo de erro uma msg e seu codigo interno q documentaremos
+	entao ficara assim, por ex
+	$erros = [
+		// erro 405 - de verbo http nao permitido pelo endpoint
+		405 => [
+			"message" => "erro de metodo nao permitido para esse endpoint"
+			"code" => "003"
+		]
+	]
+
+	e entao podemos pegar o tipo de erro usando a chave q é o codigo de erro, e buscar usando o codigo la da exception $e
+
+	entao ficaria +- assim:
+	$erros[$e->getStatusCode()]["message"] <- teremos a msg
+	$erros[$e->getStatusCode()]["code"] <- teremos o codigo
+	e passamos isso no getResponse
+	lembrando, esse array de erros é bom ficar em outro metodo, separado
+	e tambem pode dar erro caso nao ache o codigo, entao faça algum padrao no final, ou verificar se nao achou nada, para tratar o erro
+
+video 22:
+	validando dados
+	vamos fazer uma forma de validação dos dados q estamos recebendo para saber se estao corretos, se seguem as regras e etc.
+	vamos usar uma classe static do laravel padrao, chamada Validator
+	se usa \validator::make()
+	dentro do make, passamos como parametro os campos, no caso estamos pegando do request, entao passamos pelo $request->all()
+	e o outro parametro é um array com as regras de cada um dos campos
+	se é obrigatorio, qtd min ou max, tipo de dado e etc, veja na doc do laravel como é, usei mt ao fazer validacao por classe, criando uma classe padrao q faz essa validacao, em outro projeto
+
+	depois disso, para verificar, mande esse \validator para uma variavel, ele vai retornar uma instancia
+	na variavel pegue o metodo ->fails() para entrar num if, se tiver erro mande para o usuario uma resposta padrao em json comoo ja estamos fazendo, usando o response
+	response()->json($validator->errors()) <- metodo do validator q mostra o erro q foi retornado
+	e como segundo parametro o codigo do erro do http, no caso, erro de campos faltando é 422
+
+video 23:
+	melhorando a validacao
+	como visto no video 22, para melhorar a validação podemos retirar todo o if q fizemos, verificando o erro e retornando
+	e retirar a variavel q recebe o validator
+	deixar o validator executando msm sem return, e entao no final dele por um metodo validate, 
+	... )->validate();
+	esse metodo q ja recebe o que foi feito e envia de forma nativa do laravel pelo handler para retornar o erro
+	entao vai cair no tratamento q fizemos
+
+	fazendo mais um else if no nosso getJsonException
+	para verificar se a instancia é do erro retornado, o validator é do tipo
+	use Illuminate\Validation\ValidationException;
+	entao criamos um metodo com nome parecido mas o v minusculo
+	recebendo a exception
+	como ele pode retornar mais de 1, e tem seus campos, de nome do campo, detalhe e tudo mais
+	vamos retornar daqui msm pelo response
+	em json, passando pelo metodo errors, da $e (exception) e passando o codigo pegando do metodo da classe tbm, ->status
+	e pronto, pode ser mais melhorado, mudando as msgs, mandando pelo nosso metodo q padrao mas fazendo ele passar arrays e etc..
+
+video 24:
+	validando com o form request
+	Validando da forma que eu falei no video 23, criando um form request, uma classe padrao do laravel q criamos por model e ela faz a validação direto pelo tipo de variavel, passando vem vez da classe Student no parametro, passamos do tipo StudentRequest por ex
+
+	php artisan make:request StudentRequest
+
+	esse é o comando para criar o request
+	a pasta é criada, no Http requests, e dentro o request criado
+
+	nela tem o metodo rules
+	aquelas regras q criamos no validate, passamos dentro do array q retorna ai, nesse metodo
+	e o outro metodo é o authorized, ele pode estar como false, mas deixe-o como true, para ser sempre authorizado
+
+	para usar coloque o use no topo do controller
+	e mude o tipo de parametro do metodo, q esta recebendo somente request, agora para o StudentRequest
+	e pronto ele ja faz a validacao por ali
+	nao precisa mais do codigo do validator no controller
+
+	pode usar o msm request nos outros metodo, como update, apenas onde vc esta receebendo dados q precisem validar
+
+video 25:
+	Serializacao
+
+	o Laravel quando retorna os dados para vc, direto do get, ele retorna um collection, e usamos o response para exibir como json, internamente o laravel verifica se aqueles dados pode ser serializado para json ou ele vai fazer em array e entao encodar json
+
+	o codigo q ele faz para trazer em json serializado é
+	para array	
+	Student::get()->toArray()
+	ou para json
+	Student::get()->toJson()
+
+	nós podemos fazer algumas mudanças na serializacao de alguns dados, da seguinte forma
+	no model, criamos uma propriedade chamadas casts, sendo ela protected
+	é um array []
+	dentro dela a gente coloca o nome da coluna e passamos alguma regra de formatacao por ex
+	pesquisar na doc do laravel mais a fundo
+	exemplo: formatar a data
+	protected $casts = [
+		'birth' => 'date:d/m/Y'
+	];
+
+video 26:
+	Mostrar/esconder campos serializacao
+
+	Na serializacao como visto anteriormente, podemos alem de formatar, escolher o que vamos mostrar ou esconder
+
+	criando propriedades protected no model da classe que queremos, e passando no array os nomes dos campos
+	os nomes das propriedades deve ser:
+	esconder: $hidden
+	mostrar: $visible
+
+	além disso, podemos faze-lo também "localmente", no controller ou onde estivermos fazendo a sua serializacao
+	apos pegar os dados do collection entao podemos usar os metodos
+	
+	Student::get()->makeHidden('birth')
+	->makeVisible('gerder')
+
+	para esconder ou mostrar. E deve ser um metodo para cada campo, entao pode-se colocar quantos quiser
+
+video 27:
+	add atributos dinamicamente
+	nos podemos criar colunas novas, campos, para serem exibidos dinamicamente na hr da serializacao, sem que eles existem no banco de dados
+
+	primeiro temos q criar um metodo com uma nomeclatura especifica q o laravel irá pegar
+	o nome é:
+	getNomeColunaAttribute
+
+	o NomeColuna é o nome que poderemos colcar o que quiseremos, porem tem q seguir a regra da primeira Letra maiuscula
+
+	dentro dela, podemos retornar o dado que deve ser exibido na coluna, seja o que for.
+
+	ps: pelo model podemos usar um metodo chamado attribute[] e passar como chave o nome de um campo q exista para pegar o valor dele
+
+	com o metodo feito, temos de colocar esse novo atributo na serializacao
+
+	ainda no model, criamos outra propriedade protected, chamada $appends
+	q irá anexar atributos virtuais na serializacao do registro
+	passando no array o nome do atributo, POREM o nome tem q seguir o outro formato, tudo minusculo e separando por underline
+	entao se o metodo foi
+	NomeColuna
+	o atributo se chamará
+	nome_coluna
+
+	obs: se usar o hidden, nao se preocupe o novo atributo vai aparecer, se usar o visible, deve colocar o novo atributo no array para exibir também.
+
+video 28 e video 29:
+	camada de transformacao - transformando item unico
+
+	As vezes pode ser necessario uma modificacao na formatacao e em como vamos entregar esses dados da api ao usuario
+	se chama camada de transformacao, no laravel hj em dia ele conta com um codigos q ja fazem isso, nos resources
+	antigamente era necessario instalar um packges para usar.
+
+	nos temos q criar um resource novo para cada model que queremos, entao temos o Student e teremos o Student na pasta Resources, q fica dentro de Http, dentro de App
+
+	o comando no terminal é
+	php artisan make:resource NomeDesejado
+
+	para usarmos ela, temos q importar no arquivo q formos usar, como no controller
+	ela ja tem o nome de Student como do model, para mudar isso de um alias, usando um 'as'
+	assim fica:
+	use App\Http\Resources\Student as StudentResources;
+
+	e seu uso é comum, vc simplesmente instancia um novo objeto com new StudentResources e passa como parametro no constructor da instancia a variavel q tem q ser do model informado
+
+	dentro do StudentResource tem o metodo q retorna a serializacao, em array
+	nela vc pode apagar e fazer o seu formato de retorno
+	criando assim sua camada de transformacao
+	coloco no array assim:
+	[
+		'id' => $this->id
+	]
+	como essa classe herda do jsonResources e faz parte do model, ela tem acesso aos atributos originais do model, podendo ser acessada diretamente
+
+	o bom da camada de transformacao é a consistencia da nomeclatura dos dados de retorno, podendo mudar no banco mas permanecendo no retorno o msm, sem quebrar qualquer aplicacao q utilize sua API
+	e pode formar um cast, como em c# usando antes do atributo o tipo desejado
+	como por ex
+	(int) $this->classroom_id
+	e pode ser modificado e alterado e etc etc, criando metodos nele de formatacao a mais e tudo que desejar
+
+video 30:
+	Transformando a coleção de dados
+
+	como visto no video 28 e 29, conseguimos transformar os dados q vem para poder retornar mais simples, podendo formatar e etc
+
+	porem só funciona se retornarmos usando o collection do laravel, o ::get
+	e quando usamos o Resource q criamos ele nao vem formatado
+
+	Para isso tem uma solução, o laravel tem a forma de fazer resource especifico para collections
+
+	usando o mesmo comando q fizemos para resource mas fazenod uma nomeclatura especifica
+	se quisermos um resource collection do Student nos faremos
+
+	StudentCollection <- assim o laravel entende e ja faz da forma de collection
+
+	se nao podemos fazer o nome do model no plural por ex e add um --collection
+	e pronto ele cria na mesma pasta o resource
+
+	para usarmos fazemos como no resource normal, importamos e instanciamos a classe passando como parametro o collection q vamos formatar
+	no caso o parametro é o Student::get()
+
+	Agora no laravel 8 ele ja esta formatando certinho pegando do model e etc, porem antigamente era necessario add uma propriedade chamada
+	public $collects
+
+	e passavamos o caminho da classe model original da onde ele iria pegar os casts pra formatar, entao ficaria
+	public $collects = \App\Http\Resources\Student::class;
+	ou
+	public $collects = Student::class;
+
+	já q esta no mesmo nivel de pastas do namespace
+
+	e no metodo q retorna, podemos fazer as mudanças q desejarmos !
+	ps: para retornar os dados do collection caso a gente queira mudar, é
+	$this->collection
+
+video 31:
+	Padrao de Retorno
+
+	https://jsonapi.org/
+
+	siga a convensão de retorno da json Api
+
+	porem nao precisa por todos os dados caso nao tenha
+
+	faça igual em todos os endpoints q tenham retorno
+
+	DOCUMENTE ISSO !!!!!!!!!!!!!!!!!!
+	para os usuarios q iram usar sua API
+
+video 32:
+	Trabalhando com relações/relacionamento/Navigations/
+
+	com o metodo q criamos no model de ClassRoom ele tem a ideia de ser chamado como um atributo e acessar o item pelo id de relação com o registro e trazer o registro da FK.
+
+	entao se no banco temos um classroom_id, e o metodo se chama Classroom, 
+	em vez de chamarmos $this->classroom_id
+	chama $this->Classroom q vai trazer o registro da sala
+
+	e no metodo Classroom temos um returno com o caminho para o model do Classroom
+	return $this->hasMany('App\Models\Student');
+
+	hasMany é relação de 1 para N
+
+	e ai podemos criar um resource para o classroom e chama-lo dentro do outro resource para formatar o class room e assim em diante
+
+video 33:
+	Carregando relação opcional
+
+	podemos usar um metodo default q só tras uma relação se ela tiver sido carregada no contexto
+
+	pela classe que criamos do resource do student, tem um metodo q se chama whenLoaded
+	chamamos pela propria classe, $this e passamos como parametro uma string, o nome do relacionamento, do metodo de relacionamento no model.
+
+	a partir dai ele só vai exibir no retorno se tiver sido carregada, como ?
+
+	no controller onde estamos retornando o collection, antes do get e depois de chamar o model, chamaremos o metodo
+	with('') e dentro passamos o nome do relacionamento q vamos carregar, assim o resrource entende e carrega ele.
+
+	podemos passar como parametro pra fazer um if e verificar se vamos usar o with ou nao
+
+	podemos colocar no endpoint um 
+	../?include=classroom
+
+	e no controller, pegar pelo Request
+	usando metodo ->query() e passar pelo parametro o nome do campo q botamos no endpoint, no caso o include
+	E então verificamos se o seu valor é o que desejamos e etc..
+
+	se fizer toda essa verificacao, é interessante tratar isso, fazer um service, verificar os parametros e etc etc.. para nao sujar o controller
+
+video 34:
+	Paginação
+
+	o laravel tem um tratamento para paginacao default
+	em vez de buscar o metodo usando GET busque usando usando o PAGINATE() e passe como parametro a quantidade por pagina que se deseja
+	ele ja vai tratar como um parametro chamado page=x onde X é a pagina em que deseja ir.
+
+	porem para retornar isso, temos q alterar o retorno. Pois nos retornamos dentro do response (helper) e json, isso faz com que ele ja trate os dados que vem do Resource que criamos. Entao retire isso, retire o response()->json, ele vai retornar os dados completos com paginas que tem, onde esta, a proxima, a anterior e etc
+	e podemos depois, pelo collection, fazer um retorno do response, e acessando os metodos do statusCode e etc.. pesquisar
+
+video 35:
+	Exibindo salas de aula
+
+	vamos criar o controller das salas de aula
+
+	obs:
+	em vez de criamos as rotas manualmente no api.php em routes
+	podemos usar um comando default do laravel q vai criar as rotas de forma interna
+
+	Route::apiResource('nomedoModeleEtc', 'NomedoController');
+
+	pronto, se formos listar as rotas no terminal, o laravel vai trazer as rotas do model com os nomes dos metodos PADRAO !! entao se usar dessa forma, lembre de criar o controller usando o comando --api para ele criar os metodos padrao
+	q é show, destroy, index, e etc...
+
+video 36:
+	Usando o package Fractal
+
+	No laravel anterior do 5.5 o laravel nao possuia o apiResource com as camadas de transformacao, paginacao, Resource e etc
+
+	entao as pessoas usavam o Package Fractal q faz isso tudo. hj em dia para o laravel nao é necessario, mas é interessante saber para caso uma aplicação antiga usar e tivermos que dar manutenção, sabermos mexer e/ou saber o nome para poder pesquisar
+
+	instala como um package normal, usando o composer e tal..
+
+video 37:
+	Implementando HATEOAS
+
+
+	HATEOS nada mais é do que uma bibliografia sobre aqueles dados.
+	Ele normalmente vem com o nome de links, pelo laravel
+	nele vem os links e informacoes sobre aqueles dados. 
+	Se estiver fora dos dados, ele é conhecido como Hateos Global !
+	e os de dentro são hateos local
+	os links podem vir com os links para o proximo item (se for paginado por ex),
+	o endpoint usado, o que vem com parametros e etc
+	no local podemos passar as rotas que existem e o que pode ser feito daqueles dados, assim:
+	'links' => [
+		[
+			'type' => 'GET',
+			'rel' => 'show',
+			'url' => route('students.show', $this->id)
+		],
+		[
+			'type' => 'PUT',
+			'rel' => 'update',
+			'url' => route('students.update', $this->id)
+		],
+		[
+			'type' => "DELETE",
+			'rel' => 'delete',
+			'url' => route('students.destroy', $this->id)
+		]
+	]
+
+	nele podemos pegar o nome da rota e o que usamos como parametro, o verbo, o endpoint e o rel (q é como uma explicacao do que é aquilo, com uma palavra ou um nome)
+	o route tras o endpoint
+	normalmente essas sao padronizacao dos nomes, mas nao à regras
+
+video 38:
+	melhorando o processo de criação do HATEOAS
+
+	podemos melhorar isso (mas nao de forma nativa) criando uma classe para ser chamada e gerar esses links
+
+	a classe é criada manualmente, ela simplesmente cria um array com os links, tem metodo pra add no array, metodos de cada tipo passando o verbo manualmente e só pedindo o rel e url
+
+	e retorna a propriedade como array, a classe implementa o Arrayable
+	entao a classe fica +- assim, veja no codigo
+
+	use Illuminate\Contracts\Support\Arrayable;
+	class LinksGenerator implements Arrayable
+
+	e entao faz a chamada dele no resource onde chamara o hateoas
+
+video 39:
+	Content negotiation
+
+	é uma especificacao no header que chegará do cliente para a nossa API
+	ela definirá algumas informações para a gente, como por exemplo o tipo de retorno esperado
+	pela key accept
+	ela dirá se espera um application/json, xml, yaml e etc
+	para isso nós podemos receber o header pelo helper request() e pegar o header, ou ver pelo metodo wantsJson q retorna bool
+
+	e então tratar como XML ou fazer o que desejar
+	pesquise, nao fiz o codigo, pois smp pode mudar, pesquisar como fazer, laravel faz até nativamente !!
+
+video 40:
+	Rate Limiting
+
+	é o que podemos limitar a quantidade de requisicoes por x tempo na endpoint
+	ele vai retornar uma instancia de erro chamada ThrottleRequestsException
+	que pode mudar
+	entao pesquise
+
+	podemos alterar o limite no kernel do Exceptions, onde podemos alterar a qtd por x minuto
+	no array de api, na chave chamada throttle
+
+	'api' => [
+		'throttle:api',
+		// limita a qtd q pode ser feito de requisicoes no endpoint por X minuto
+		// entao é qtd,tempo
+		// ex: 2 requisicoes por 1 minuto
+		// 'throttle:2,1',
+		\Illuminate\Routing\Middleware\SubstituteBindings::class,
+	],
+
+	no middlewareGroups
+
+	ps: na doc diz q pode ser colocado tbm como 2° parametro direto no routes, quando esta criando o middlear por lá
+
+video 41:
+	controle de CORS
+
+	é quando podemos controlar, negar ou permitir o acesso a nossa API com os dados do header, o metodo de acesso e etc
+
+	para isso utilize algum package para o laravel, pesquise, tem o fruitcake q nao esta funcionando, e o testado no video é o barryvdh/laravel-cors pesquise !!!
+
+	veja como é a configuracao, simples e pronto
+
+video 42:
+	Documentando sua API usando Swagger UI
+
+	é um package que gera toda uma documentação com base no comentario em cima dos metodos.
+
+	Existem outros tipos no mercado, pesquise
+
+	va no git e veja como configurar, tem q colocar o comentario em cima do metodo, e pode ter 2 tipos de comentarios/annotations
+
+	um do proprio swagger e outro de open api
+	faça a instalação, veja como configurar, colocar o que é necessario, tem um comentario q tem q estar pelo menos 1x no projeto todo com as informacoes do projeto
+
+	e então rode o comando q vai gerar a documentacao
+	ele vai gerar ate views e etc e uma endpoint q vai levar pra ler a documentacao, toda personalizada, com todas as endpoints, como é feita, as configuracoes dela, o q é preciso e etc, ex:
+
+	link.com.br/api/documentation
+
+	ai la vai ta um site todo bonito e tal com a documentacao ja feita, com base nos comentarios dos metodos !!
+
+	veja como fazer, pesquise, é simples.
+
+	OBS: para nao aumentar o tamanho do projeto ao versionar no git por ex, coloque no gitignore a pasta da view do swagger q vai criar o "site front" da documentacao. pesquisa para saber qual, mas por ex:
+	em 2021 é esse para colocar no gitignore
+
+	./resources/views/vendor/l5-swagger
+
+
+video 43:
+	criando uma aplicacao simples em front para consumir nossa api
+
+	criou um html e um codigo em jquery para consumir a api usando o ajax pra acessar a endpoint de listagem de alunos
+	e entao criou um table e add à pagina
+
+video 44:
+	o mesmo do 43, mas agora consumindo o endpoint de deletar o registro
+
+video 45:
+	criando um formulario de criacao para consumir o endpoint de inserir um registro
+
+video 46:
+	criando um formulario de criacao para consumir o endpoint de inserir um registro parte 2
+	ps: nossa aplicacao recebe em json, entao ao passar os dados tem q lembrar de passar no formato json
+
+video 47:
+	carregando salas de aula
+	lembrar se nossa api tem o accept para aceitar somente em x formato (no caso em json) e se vamos carregar a sala de aula, temos q ver se esta carregando usando o include no parametro e se precisamos carrega-la no model com o whenLoaded e tudo mais
+
+video 48:
+	populando o formulario para atualizacao
+
+	consumindo o endpoint de update passando o id e populando um formulario com os dados
+
+video 49:
+	e entao colocar no botao de salvar o endpoint de update para enviar via ajax os dados para inserir na api
+
+video 50:
+	validando os dados para o cliente
+
+	se der erro ele vai retornar, entao vamos pegar e exibir ao cliente para que ele saiba o que aconteceu de errado
+
+BIBLIOGRAFIA:
+	Treinaweb
+	desenvolvimento de api rest em laravel
